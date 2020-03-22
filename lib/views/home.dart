@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:indianews/helper/data.dart';
 import 'package:indianews/helper/news.dart';
 import 'package:indianews/model/article_model.dart';
 import 'package:indianews/model/category_model.dart';
 import 'package:indianews/views/article_view.dart';
+import 'package:indianews/views/category.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -99,14 +101,21 @@ class _HomeState extends State<Home> {
 }
 
 class CategoryTitle extends StatelessWidget {
-  final imageUrl, categoryName;
+  final String imageUrl, categoryName;
 
   CategoryTitle({this.imageUrl, this.categoryName});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CategoryNews(
+                      category: categoryName.toLowerCase(),
+                    )));
+      },
       child: Container(
         margin: EdgeInsets.only(right: 16),
         child: Stack(
