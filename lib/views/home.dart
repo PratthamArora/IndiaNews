@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indianews/helper/data.dart';
+import 'package:indianews/helper/news.dart';
 import 'package:indianews/model/article_model.dart';
 import 'package:indianews/model/category_model.dart';
 
@@ -11,11 +12,22 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<CategoryModel> categories = new List<CategoryModel>();
   List<ArticleModel> articles = new List<ArticleModel>();
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     categories = getCategory();
+    getNews();
+  }
+
+  getNews() async {
+    News news = News();
+    await news.getNews();
+    articles = news.news;
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override
@@ -34,26 +46,47 @@ class _HomeState extends State<Home> {
         ),
         elevation: 0.0,
       ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              height: 70,
-              child: ListView.builder(
-                  itemCount: categories.length,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return CategoryTitle(
-                      imageUrl: categories[index].imageUrl,
-                      categoryName: categories[index].categoryName,
-                    );
-                  }),
+      body: _loading
+          ? Center(
+              child: Container(
+                child: CircularProgressIndicator(),
+              ),
             )
-          ],
-        ),
-      ),
+          : Container(
+              child: Column(
+                children: <Widget>[
+                  ///Categories
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    height: 70,
+                    child: ListView.builder(
+                        itemCount: categories.length,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return CategoryTitle(
+                            imageUrl: categories[index].imageUrl,
+                            categoryName: categories[index].categoryName,
+                          );
+                        }),
+                  ),
+
+                  ///Posts
+                  Container(
+                    child: ListView.builder(
+                        itemCount: articles.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return NewsCard(
+                            imageUrl: articles[index].urlToImage,
+                            title: articles[index].title,
+                            desc: articles[index].description,
+                          );
+                        }),
+                  )
+                ],
+              ),
+            ),
     );
   }
 }
